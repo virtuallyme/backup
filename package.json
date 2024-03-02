@@ -1,0 +1,18 @@
+{
+  "name": "penpal",
+  "version": "1.0.0",
+  "description": "Code repository for PenPal.",
+  "main": "index.js",
+  "scripts": {
+    "server": "cd backend && serverless offline && cd -",
+    "client": "npm start --prefix MobileApp",
+    "app": "concurrently --kill-others \"npm run server\" \"npm run client\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "web": "cd web-app && npm start"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

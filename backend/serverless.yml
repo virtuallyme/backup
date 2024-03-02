@@ -1,0 +1,51 @@
+service: penpal
+frameworkVersion: "3"
+
+custom:
+  # port to use when testing offline
+  serverless-offline:
+    httpPort: 5000
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  timeout: 90 # timeout in seconds
+  region: us-east-1
+  environment:
+    MONGO_URI: ${ssm:/PENPAL_MONGO_URI}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - cognito-idp:AdminInitiateAuth
+        - cognito-idp:AdminCreateUser
+        - cognito-idp:AdminSetUserPassword
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - cloudformation:DescribeStacks
+      Resource: "*"
+
+functions:
+  app:
+    handler: app.server
+    events: # events trigger lambda functions
+      - http: # this is an API Gateway HTTP event trigger
+          path: /
+          method: ANY
+          cors: true
+      - http:
+          path: /waitlist # adds someone to the waitlist
+          method: POST
+          cors: true
+      - http:
+          path: /get_waitlist_sign_ups # returns a list of everyone who signed up for the waitlist
+          method: POST
+          cors: true
+      - http: # all routes get proxied to the Express router
+          path: /{proxy+}
+          method: ANY
+          cors: true
+
+plugins:
+  - serverless-offline
